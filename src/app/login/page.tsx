@@ -13,7 +13,7 @@ export default function Login() {
                     Нужен аккаунт?
                 </Link>
             </div>
-            <div className="mt-20 mb-20">
+            <div className="my-20">
                 <LoginForm />
             </div>
         </div>

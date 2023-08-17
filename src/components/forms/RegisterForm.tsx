@@ -60,64 +60,62 @@ export default function RegisterForm() {
     }
 
     return (
-        <div className="mx-auto px-10 w-fit">
-            <form onSubmit={onSubmit} className="flex flex-col items-center gap-4">
-                <label className="text-lg">Имя</label>
+        <form onSubmit={onSubmit} className="flex flex-col items-center gap-4">
+            <label className="text-lg">Имя</label>
+            <CustomInput
+                type="text"
+                placeholder="?????"
+                value={name}
+                onChange={onNameChange}
+            />
+            <label className="text-lg">Идентификатор</label>
+            <div className="relative w-full">
                 <CustomInput
                     type="text"
                     placeholder="?????"
-                    value={name}
-                    onChange={onNameChange}
+                    value={id}
+                    maxLength={16}
+                    onInput={(e: React.ChangeEvent<HTMLInputElement>) => e.target.value = e.target.value.toLowerCase()}
+                    onChange={onIdChange}
                 />
-                <label className="text-lg">Идентификатор</label>
-                <div className="relative w-full">
-                    <CustomInput
-                        type="text"
-                        placeholder="?????"
-                        value={id}
-                        maxLength={16}
-                        onInput={(e: React.ChangeEvent<HTMLInputElement>) => e.target.value = e.target.value.toLowerCase()}
-                        onChange={onIdChange}
-                    />
-                    {idLoading && <div className="absolute left-full top-1 ml-6"><CircleLoader/></div>}
-                    {!idLoading && <span
-                        className={"block mx-5 mt-3 max-w-sm " + (idCheck.correct && idCorrect ? "text-green-500" : "text-red-500")}
-                    >
-                    {id && idCheck.error ? idCheck.error : idMessage}
-                    </span>}
-                </div>
-                <label className="text-lg">Почта</label>
-                <CustomInput
-                    type="email"
-                    placeholder="123@gmail.com"
-                    value={email}
-                    onChange={onEmailChange}
-                />
-                <label className="text-lg">Пароль</label>
-                <PasswordInput
-                    visible={passVisible}
-                    onToggleVisibility={setPassVisible}
-                    value={password}
-                    onChange={onPasswordChange}
-                />
-                <label className="text-lg">Повторите пароль</label>
-                <PasswordInput
-                    visible={passVisible}
-                    onToggleVisibility={setPassVisible}
-                    value={repeatedPass}
-                    onChange={onRepeatedPassChange}
-                />
-                <div className="relative">
-                    <CustomButton
-                        className="mt-2"
-                        type="submit"
-                        disabled={loading || !checkResult.correct || !idCheck.correct || !idCorrect}
-                    >Зарегистрироваться
-                    </CustomButton>
-                    {loading && <div className="absolute left-full top-1/4 ml-6"><CircleLoader/></div>}
-                </div>
-                <span className="-mt-1 text-md text-rose-500">{checkResult.error || error}</span>
-            </form>
-        </div>
+                {idLoading && <div className="absolute left-full top-1 ml-6"><CircleLoader/></div>}
+                {!idLoading && <span
+                    className={"block mx-5 mt-3 max-w-sm " + (idCheck.correct && idCorrect ? "text-green-500" : "text-red-500")}
+                >
+                {id && idCheck.error ? idCheck.error : idMessage}
+                </span>}
+            </div>
+            <label className="text-lg">Почта</label>
+            <CustomInput
+                type="email"
+                placeholder="123@gmail.com"
+                value={email}
+                onChange={onEmailChange}
+            />
+            <label className="text-lg">Пароль</label>
+            <PasswordInput
+                visible={passVisible}
+                onToggleVisibility={setPassVisible}
+                value={password}
+                onChange={onPasswordChange}
+            />
+            <label className="text-lg">Повторите пароль</label>
+            <PasswordInput
+                visible={passVisible}
+                onToggleVisibility={setPassVisible}
+                value={repeatedPass}
+                onChange={onRepeatedPassChange}
+            />
+            <div className="relative">
+                <CustomButton
+                    className="mt-2"
+                    type="submit"
+                    disabled={loading || !checkResult.correct || !idCheck.correct || !idCorrect}
+                >Зарегистрироваться
+                </CustomButton>
+                {loading && <div className="absolute left-full top-1/4 ml-6"><CircleLoader/></div>}
+            </div>
+            <span className="-mt-1 text-md text-rose-500">{checkResult.error || error}</span>
+        </form>
     )
 }

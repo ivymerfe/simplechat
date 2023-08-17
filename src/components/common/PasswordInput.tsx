@@ -2,22 +2,18 @@ import React, { ChangeEventHandler } from 'react';
 import CustomInput from './CustomInput';
 import './PasswordInput.css';
 
-type PasswordInputProps = {
-    value?: string,
+interface PasswordInputProps extends React.ComponentProps<"input"> {
     visible: boolean,
     onToggleVisibility: Function,
-    onChange?: ChangeEventHandler<HTMLInputElement>
 }
 
 export default function PasswordInput(props: PasswordInputProps) {
     return (
-        <div className='relative inline-block w-full'>
+        <div className='relative inline-block'>
             <CustomInput
-                className='pr-10'
+                className={'pr-10 ' + (props.className ?? "")}
                 type={props.visible ? "text":"password"}
                 placeholder={props.visible ? "12345":"*****"}
-                value={props.value}
-                onChange={props.onChange}
             />
             <button
                 type="button"

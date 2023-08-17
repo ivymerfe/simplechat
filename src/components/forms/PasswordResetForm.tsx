@@ -93,36 +93,34 @@ export default function PasswordResetForm() {
     )
 
     return (
-        <div className="mx-auto px-8 w-fit">
-            <div className="flex flex-col items-center gap-6">
-                <span className="block text-lg">Почта</span>
-                <div className="relative w-full">
-                    <CustomInput
-                        type="email"
-                        placeholder="123@gmail.com"
-                        disabled={emailAccepted}
-                        value={email}
-                        onChange={onEmailChange}
-                    />
-                    {emailAccepted && <CustomButton
-                        className="inline-block mt-4 sm:absolute sm:ml-4 sm:mt-0 sm:h-full text-sm"
-                        onClick={() => (setEmailAccepted(false),setEmailCode(""))}
-                    >
-                        Изменить
-                    </CustomButton>}
-                </div>
-                {emailAccepted && nextStep}
-                <div className="relative">
-                    <CustomButton
-                        disabled={!emailCorrect || (emailAccepted && !formCheck.correct)}
-                        onClick={onSubmit}
-                    >
-                        {emailAccepted ? "Сохранить" : "Продолжить"}
-                    </CustomButton>
-                    {loading && <div className="absolute left-full top-1/4 ml-6"><CircleLoader/></div>}
-                </div>
-                <span className="block -mt-3 text-red-500">{(emailAccepted && formCheck.error) || error}</span>
+        <div className="flex flex-col items-center gap-6">
+            <span className="block text-lg">Почта</span>
+            <div className="relative w-full">
+                <CustomInput
+                    type="email"
+                    placeholder="123@gmail.com"
+                    disabled={emailAccepted}
+                    value={email}
+                    onChange={onEmailChange}
+                />
+                {emailAccepted && <CustomButton
+                    className="block mx-auto mt-4 sm:inline sm:absolute sm:ml-4 sm:mt-0 sm:mr-0 sm:h-full text-sm"
+                    onClick={() => (setEmailAccepted(false),setEmailCode(""))}
+                >
+                    Изменить
+                </CustomButton>}
             </div>
+            {emailAccepted && nextStep}
+            <div className="relative">
+                <CustomButton
+                    disabled={!emailCorrect || (emailAccepted && !formCheck.correct)}
+                    onClick={onSubmit}
+                >
+                    {emailAccepted ? "Сохранить" : "Продолжить"}
+                </CustomButton>
+                {loading && <div className="absolute left-full top-1/4 ml-6"><CircleLoader/></div>}
+            </div>
+            <span className="block -mt-3 text-red-500">{(emailAccepted && formCheck.error) || error}</span>
         </div>
     )
 }

@@ -44,12 +44,12 @@ export default function EmailConfirmForm() {
     }
 
     return (
-        <div className="mx-auto px-8 w-fit">
+        <div className="mx-auto px-8">
             <div className="text-lg">
                 <span>На адрес </span><span className="text-slate-700 dark:text-slate-300">{email}</span><span> пришел код для подтверждения.</span>
                 <span className="block">Введи его ниже.</span>
             </div>
-            <div className="relative mt-12 mx-auto w-fit">
+            <div className="relative mt-12">
                 <CodeInput
                     value={code}
                     onChange={onCodeChanged}

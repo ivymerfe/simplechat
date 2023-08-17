@@ -35,10 +35,11 @@ export default function PasswordResetForm() {
         // Request api: check if exists and send code
         // Also set loading
         setEmailAccepted(true);
+        setLoading(true);
         // If email already accepted, send data
     }
 
-    function onCodeChanged(e: React.ChangeEvent<HTMLInputElement>) {
+    function onCodeChange(e: React.ChangeEvent<HTMLInputElement>) {
         const code = e.target.value;
         setEmailCode(code);
         setError("");
@@ -65,7 +66,7 @@ export default function PasswordResetForm() {
             <div className="relative">
                 <CodeInput
                     value={emailCode}
-                    onChange={onCodeChanged}
+                    onChange={onCodeChange}
                 />
                 <TimerButton
                     className="sm:absolute block sm:inline mx-auto mt-4 sm:mt-1 sm:ml-4 sm:mr-0 whitespace-nowrap text-sm"
@@ -118,7 +119,7 @@ export default function PasswordResetForm() {
                 >
                     {emailAccepted ? "Сохранить" : "Продолжить"}
                 </CustomButton>
-                {loading && <div className="absolute left-full top-1/4 ml-6"><CircleLoader/></div>}
+                {loading && <div className="absolute left-full top-1 ml-6"><CircleLoader/></div>}
             </div>
             <span className="block -mt-3 text-red-500">{(emailAccepted && formCheck.error) || error}</span>
         </div>

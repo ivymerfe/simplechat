@@ -57,6 +57,7 @@ export default function RegisterForm() {
         e.preventDefault();
         setLoading(true);
         // Request api
+        console.log(password)
     }
 
     return (
@@ -66,10 +67,11 @@ export default function RegisterForm() {
                 type="text"
                 placeholder="?????"
                 value={name}
+                maxLength={64}
                 onChange={onNameChange}
             />
             <label className="text-lg">Идентификатор</label>
-            <div className="relative w-full">
+            <div className="relative">
                 <CustomInput
                     type="text"
                     placeholder="?????"
@@ -113,7 +115,7 @@ export default function RegisterForm() {
                     disabled={loading || !checkResult.correct || !idCheck.correct || !idCorrect}
                 >Зарегистрироваться
                 </CustomButton>
-                {loading && <div className="absolute left-full top-1/4 ml-6"><CircleLoader/></div>}
+                {loading && <div className="absolute left-full top-1 ml-6"><CircleLoader/></div>}
             </div>
             <span className="-mt-1 text-md text-rose-500">{checkResult.error || error}</span>
         </form>

@@ -1,0 +1,23 @@
+.avatar_remove_btn {
+    opacity: .6;
+    background: url("/icons/close.svg") no-repeat top left;
+    background-size: 100%;
+    width: 40px;
+    height: 40px;
+}
+
+.avatar_remove_btn:hover {
+    opacity: 1;
+}
+
+.avatar_upload_btn {
+    opacity: .6;
+    background: url("/icons/camera.svg") no-repeat top left;
+    background-size: 100%;
+    width: 40px;
+    height: 40px;
+}
+
+.avatar_upload_btn:hover {
+    opacity: 1;
+}

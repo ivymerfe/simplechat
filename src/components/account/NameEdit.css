@@ -1,0 +1,11 @@
+.name_edit_btn {
+    opacity: .8;
+    background: url("/icons/edit-2.svg") no-repeat top left;
+    background-size: 100%;
+    width: 28px;
+    height: 28px;
+}
+
+.name_edit_btn:hover {
+    opacity: 1;
+}

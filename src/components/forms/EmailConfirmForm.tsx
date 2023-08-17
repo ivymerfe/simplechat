@@ -20,7 +20,7 @@ export default function EmailConfirmForm() {
         e.target.value = e.target.value.replace(/[^0-9.]/g, '');
     }
 
-    function onCodeChanged(e: React.ChangeEvent<HTMLInputElement>) {
+    function onCodeChange(e: React.ChangeEvent<HTMLInputElement>) {
         const code = e.target.value;
         setCode(code);
         if (code.length === 0) {
@@ -49,10 +49,10 @@ export default function EmailConfirmForm() {
                 <span>На адрес </span><span className="text-slate-700 dark:text-slate-300">{email}</span><span> пришел код для подтверждения.</span>
                 <span className="block">Введи его ниже.</span>
             </div>
-            <div className="relative mt-12">
+            <div className="relative mt-12 mx-auto w-fit">
                 <CodeInput
                     value={code}
-                    onChange={onCodeChanged}
+                    onChange={onCodeChange}
                 />
                 {loading && <div className="absolute left-full top-1 ml-6"><CircleLoader /></div>}
                 {!loading && <TimerButton

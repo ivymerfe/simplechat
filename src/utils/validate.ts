@@ -1,6 +1,6 @@
 
 export function validateEmail(email: string): Boolean {
-    return /[a-z0-9]+@[a-z]+\.[a-z]{2,3}/.test(email);
+    return /^[a-z0-9]+@[a-z]+\.[a-z]{2,3}$/.test(email);
 }
 
 export function checkLogin(email: string, pass: string): {correct: boolean, error: string} {
@@ -65,6 +65,41 @@ export function checkPasswordReset(emailCode: string, pass: string, reppass: str
     }
     if (pass !== reppass) {
         return {correct: false, error: "Пароли не совпадают"}
+    }
+    return {correct: true, error: ""}
+}
+
+export function checkEmailChange(email: string, emailCode: string) {
+    if (!email) {
+        return {correct: false, error: ""}
+    }
+    if (!validateEmail(email)) {
+        return {correct: false, error: "Некорректная почта"}
+    }
+    if (!emailCode) {
+        return {correct: false, error: ""}
+    }
+    if (emailCode.length < 6) {
+        return {correct: false, error: "Код состоит из 6 цифр"}
+    }
+    return {correct: true, error: ""}
+}
+
+export function checkPasswordChange(newPass: string, newPassRep: string, oldPass: string) {
+    if (!newPass) {
+        return {correct: false, error: ""}
+    }
+    if (newPass.length < 8) {
+        return {correct: false, error: "Пароль от 8 символов"}
+    }
+    if (newPass !== newPassRep) {
+        return {correct: false, error: "Пароли не совпадают"}
+    }
+    if (!oldPass) {
+        return {correct: false, error: ""}
+    }
+    if (oldPass.length < 8) {
+        return {correct: false, error: "Старый пароль как минимум 8 символов"}
     }
     return {correct: true, error: ""}
 }

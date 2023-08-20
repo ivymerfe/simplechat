@@ -5,3 +5,9 @@ export declare type User = {
     email: string,
     avatarUrl: string | null
 }
+
+export declare type OtherUser = {
+    name: string,
+    id: string,
+    avatarUrl: string | null
+}

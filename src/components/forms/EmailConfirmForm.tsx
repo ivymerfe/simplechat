@@ -3,7 +3,6 @@ import { User } from "@/utils/api";
 import React, { useState } from "react";
 import CircleLoader from "../common/CircleLoader";
 import CodeInput from "../common/CodeInput";
-import CustomInput from "../common/CustomInput";
 import TimerButton from "../common/TimerButton";
 
 export default function EmailConfirmForm() {
@@ -14,11 +13,6 @@ export default function EmailConfirmForm() {
 
     // Get user from api
     const email = "123@gmail.com";
-
-    // Only digits
-    function onCodeInput(e: React.ChangeEvent<HTMLInputElement>) {
-        e.target.value = e.target.value.replace(/[^0-9.]/g, '');
-    }
 
     function onCodeChange(e: React.ChangeEvent<HTMLInputElement>) {
         const code = e.target.value;
@@ -56,7 +50,7 @@ export default function EmailConfirmForm() {
                 />
                 {loading && <div className="absolute left-full top-1 ml-6"><CircleLoader /></div>}
                 {!loading && <TimerButton
-                    className="sm:absolute block sm:inline mx-auto mt-10 sm:mt-1 sm:ml-4 sm:mr-0 whitespace-nowrap text-sm"
+                    className="sm:absolute block px-4 py-3 sm:inline mx-auto mt-10 sm:mt-0 sm:ml-4 sm:mr-0 whitespace-nowrap text-sm"
                     seconds={timerSeconds}
                     setSeconds={setTimerSeconds}
                     onClick={resendCode}

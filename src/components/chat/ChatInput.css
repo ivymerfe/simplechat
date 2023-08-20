@@ -1,0 +1,9 @@
+
+.chat_input {
+    border-radius: 9999px;
+    outline: none;
+}
+
+.chat_input[contentEditable="true"]:empty:before {
+    content: attr(data-ph)
+}

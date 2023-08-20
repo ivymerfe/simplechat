@@ -1,9 +1,9 @@
 import RegisterForm from "@/components/forms/RegisterForm"
 import Link from "next/link"
 
-export default function Register() {
+export default function RegisterPage() {
     return (
-        <div className="text-center">
+        <div className="text-center mt-32">
             <span className="text-2xl">Регистрация</span>
             <div className="mt-8">
                 <Link
@@ -13,7 +13,7 @@ export default function Register() {
                     Уже есть аккаунт?
                 </Link>
             </div>
-            <div className="mt-10 mb-20">
+            <div className="mt-10 mb-10">
                 <RegisterForm />
             </div>
         </div>

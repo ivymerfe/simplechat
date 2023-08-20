@@ -1,9 +1,9 @@
 import LoginForm from "@/components/forms/LoginForm"
 import Link from "next/link"
 
-export default function Login() {
+export default function LoginPage() {
     return (
-        <div className="text-center">
+        <div className="text-center mt-32">
             <span className="text-2xl">Вход</span>
             <div className="mt-8">
                 <Link

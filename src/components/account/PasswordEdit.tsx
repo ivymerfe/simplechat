@@ -89,7 +89,7 @@ export default function PasswordEdit(props: {user: User}) {
                 />
                 <div className="relative inline-block">
                     <CustomButton
-                        className="py-0 h-8 w-40"
+                        className="h-8 w-40"
                         disabled={editing && !!newPass && (loading || !checkResult.correct)}
                         onClick={buttonAction}
                     >

@@ -62,7 +62,7 @@ export default function IdentifierEdit(props: {user: User}) {
                     />
                 </div>
                 <CustomButton
-                    className="inline-block py-0 w-40"
+                    className="inline-block h-8 w-40"
                     disabled={editing && !!id && id !== props.user.id && !(idCheck.correct && idCorrect)}
                     onClick={buttonAction}
                 >

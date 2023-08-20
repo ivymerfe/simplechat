@@ -56,7 +56,7 @@ export default function LoginForm() {
             </div>
             <div className="relative">
                 <CustomButton
-                    className="mt-2"
+                    className="mt-2 px-8 py-2"
                     type="submit"
                     disabled={loading || !checkResult.correct}
                 >Войти

@@ -63,7 +63,7 @@ export default function EmailEdit(props: {user: User}) {
                     onChange={onCodeChange}
                 />
                 <TimerButton
-                    className="sm:absolute py-0 h-8 block sm:inline-block mx-auto mt-4 sm:mt-0 sm:ml-4 sm:mr-0 whitespace-nowrap text-sm"
+                    className="sm:absolute h-8 px-4 block sm:inline-block mx-auto mt-4 sm:mt-0 sm:ml-4 sm:mr-0 whitespace-nowrap text-sm"
                     seconds={timerSeconds}
                     setSeconds={setTimerSeconds}
                     onClick={resendCode}
@@ -87,7 +87,7 @@ export default function EmailEdit(props: {user: User}) {
                 />
                 <div className="relative inline-block">
                     <CustomButton
-                        className="py-0 h-8 w-40"
+                        className="h-8 w-40"
                         disabled={editing && !!email && email !== props.user.email && (loading || !check.correct)}
                         onClick={buttonAction}
                     >

@@ -1,6 +1,5 @@
+'use client';
 import { User } from "@/utils/api";
-import CustomInput from "../common/CustomInput";
-import Avatar from "./Avatar";
 import EmailEdit from "./EmailEdit";
 import IdentifierEdit from "./IdentifierEdit";
 import InfoEdit from "./InfoEdit";
@@ -15,6 +14,11 @@ export default function AccountView() {
         email: "123@gmail.com",
         avatarUrl: null
     }
+
+    function logout() {
+        // Call api
+    }
+
     return (
         <div className="mb-16 flex flex-col md:flex-row gap-32 justify-center items-center md:items-start">
             <div className="flex-initial mx-16">
@@ -32,6 +36,12 @@ export default function AccountView() {
                 <div className="mt-4">
                     <label className="inline-block mx-auto w-64 align-top">Пароль: </label>
                     <PasswordEdit user={testUser} />
+                </div>
+                <div className="mt-12">
+                    <button
+                        className="px-4 py-2 rounded-full bg-rose-600 hover:bg-rose-700 active:bg-rose-800"
+                        onClick={logout}
+                    >Выйти из аккаунта</button>
                 </div>
             </div>
         </div>

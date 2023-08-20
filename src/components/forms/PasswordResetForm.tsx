@@ -69,7 +69,7 @@ export default function PasswordResetForm() {
                     onChange={onCodeChange}
                 />
                 <TimerButton
-                    className="sm:absolute block sm:inline mx-auto mt-4 sm:mt-1 sm:ml-4 sm:mr-0 whitespace-nowrap text-sm"
+                    className="sm:absolute block px-4 py-2 sm:inline mx-auto mt-4 sm:mt-1 sm:ml-4 sm:mr-0 whitespace-nowrap text-sm"
                     seconds={timerSeconds}
                     setSeconds={setTimerSeconds}
                     onClick={resendCode}
@@ -105,7 +105,7 @@ export default function PasswordResetForm() {
                     onChange={onEmailChange}
                 />
                 {emailAccepted && <CustomButton
-                    className="block mx-auto mt-4 sm:inline sm:absolute sm:ml-4 sm:mt-0 sm:mr-0 sm:h-full text-sm"
+                    className="block mx-auto mt-4 px-8 py-2 sm:inline sm:absolute sm:ml-4 sm:mt-0 sm:mr-0 sm:h-full text-sm"
                     onClick={() => (setEmailAccepted(false),setEmailCode(""))}
                 >
                     Изменить
@@ -114,6 +114,7 @@ export default function PasswordResetForm() {
             {emailAccepted && nextStep}
             <div className="relative">
                 <CustomButton
+                    className="px-8 py-2"
                     disabled={!emailCorrect || (emailAccepted && !formCheck.correct)}
                     onClick={onSubmit}
                 >

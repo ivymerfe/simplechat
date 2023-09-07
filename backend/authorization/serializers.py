@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -38,7 +39,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ('username', 'email', 'password', 'name')
 
     def create(self, validated_data):
-        user = User.objects.create(**validated_data)
+        user = User.objects.create(username=validated_data['username'], email=validated_data['email'], first_name=validated_data['name'])
         user.set_password(validated_data['password'])
         user.save()
         return user
@@ -71,8 +72,37 @@ class OtherUserSerializer(serializers.ModelSerializer):
 
 
 class UsernameSerializer(serializers.Serializer):
-    id = serializers.CharField(validators=[UsernameValidator()])
+    username = serializers.CharField(validators=[UsernameValidator()])
 
 
 class EmailCodeSerializer(serializers.Serializer):
     code = serializers.CharField(validators=[EmailCodeValidator()])
+
+
+class NameSerializer(serializers.Serializer):
+    name = serializers.CharField()
+
+
+class AvatarURLSerializer(serializers.Serializer):
+    avatarUrl = serializers.URLField()
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    new_password = serializers.CharField(write_only=True, validators=[validate_password])
+    old_password = serializers.CharField(write_only=True, validators=[validate_password])
+
+
+class ChangeEmailSerializer(serializers.Serializer):
+    new_email = serializers.EmailField()
+    email_code = serializers.CharField(required=False, validators=[EmailCodeValidator()])
+
+    def validate_new_email(self, new_email):
+        if (User.objects.filter(email=new_email).exists()):
+            raise ValidationError("Email already in use.", "email_already_used")
+        return new_email
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    email_code = serializers.CharField(required=False, validators=[EmailCodeValidator()])
+    new_password = serializers.CharField(write_only=True, validators=[validate_password])

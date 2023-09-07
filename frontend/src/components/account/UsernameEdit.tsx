@@ -1,33 +1,33 @@
 'use client';
 import { User } from "@/utils/api";
-import { validateIdentifier } from "@/utils/validate";
+import { validateUsername } from "@/utils/validate";
 import React from "react";
 import CircleLoader from "../common/CircleLoader";
 import CustomButton from "../common/CustomButton";
 import CustomInput from "../common/CustomInput";
 
-export default function IdentifierEdit(props: {user: User}) {
-    const [id, setId] = React.useState(props.user.id);
+export default function UsernameEdit(props: {user: User}) {
+    const [username, setUsername] = React.useState(props.user.username);
     const [editing, setEditing] = React.useState(false);
-    const [idCorrect, setIdCorrect] = React.useState(false);
-    const [idMessage, setIdMessage] = React.useState("");
+    const [correct, setCorrect] = React.useState(false);
+    const [message, setMessage] = React.useState("");
     const [loading, setLoading] = React.useState(false);
 
-    const idCheck = validateIdentifier(id);
+    const check = validateUsername(username);
 
-    function onIdChange(e: React.ChangeEvent<HTMLInputElement>) {
-        const id = e.target.value;
-        setId(e.target.value);
-        if (validateIdentifier(id).correct) {
+    function onUsernameChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const username = e.target.value;
+        setUsername(username);
+        if (validateUsername(username).correct) {
             setLoading(true);
-            setIdCorrect(false);
-            setIdMessage("");
+            setCorrect(false);
+            setMessage("");
 
             // Check if available
             setTimeout(() => {
                 setLoading(false);
-                setIdCorrect(true);
-                setIdMessage("Свободен!");
+                setCorrect(true);
+                setMessage("Свободен!");
             }, 1000);
         }
     }
@@ -35,11 +35,11 @@ export default function IdentifierEdit(props: {user: User}) {
     function buttonAction() {
         if (!editing) {
             setEditing(true);
-            setIdMessage("");
+            setMessage("");
         } else {
             setEditing(false);
-            if (!id || id === props.user.id) {
-                setId(props.user.id);
+            if (!username || username === props.user.username) {
+                setUsername(props.user.username);
             } else {
                 // Submit new identifier
             }
@@ -54,24 +54,24 @@ export default function IdentifierEdit(props: {user: User}) {
                     <CustomInput
                         className="h-8 disabled:bg-slate-200"
                         type="text"
-                        placeholder={props.user.id}
-                        value={id}
+                        placeholder={props.user.username}
+                        value={username}
                         disabled={!editing}
-                        onChange={onIdChange}
+                        onChange={onUsernameChange}
                         maxLength={16}
                     />
                 </div>
                 <CustomButton
                     className="inline-block h-8 w-40"
-                    disabled={editing && !!id && id !== props.user.id && !(idCheck.correct && idCorrect)}
+                    disabled={editing && !!username && username !== props.user.username && !(check.correct && correct)}
                     onClick={buttonAction}
                 >
                     {editing ? "Сохранить": "Изменить"}
                 </CustomButton>
             </div>
             <span
-                className={"absolute left-0 right-0 text-center md:text-left top-full " + (idCheck.correct && idCorrect ? "text-green-500" : "text-red-500")}
-            >{editing && (idCheck.error || idMessage)}</span>
+                className={"absolute left-0 right-0 text-center md:text-left top-full " + (check.correct && correct ? "text-green-500" : "text-red-500")}
+            >{editing && (check.error || message)}</span>
         </div>
     )
 }

@@ -9,14 +9,14 @@ import SearchBar from "./SearchBar";
 export default function DialogsView() {
     const testUser: User = {
         name: "John",
-        id: "john1234",
+        username: "john1234",
         email: "123@gmail.com",
         avatarUrl: "/avatars/k.png"
     }
 
     const testChatUser: OtherUser = {
         name: "Mike",
-        id: "mikee",
+        username: "mikee",
         avatarUrl: "/avatars/m.png"
     }
     const loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer ac condimentum erat, ut vulputate magna. Duis sed enim felis. Mauris egestas feugiat dui ut cursus. Aliquam pellentesque, arcu in pretium rhoncus, dolor elit auctor nunc, eu hendrerit enim purus ut velit. Integer eu luctus est. Donec condimentum euismod cursus. Donec et dignissim eros. Nunc lacus sem, suscipit quis orci sit amet, vulputate tristique lacus. Donec rutrum velit at nibh porta, vitae posuere nisl posuere. "

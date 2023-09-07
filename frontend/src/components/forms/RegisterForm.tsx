@@ -2,16 +2,16 @@
 import React from "react";
 import CustomInput from "../common/CustomInput";
 import PasswordInput from "../common/PasswordInput";
-import { validateIdentifier, checkRegister } from "@/utils/validate";
+import { validateUsername, checkRegister } from "@/utils/validate";
 import CustomButton from "../common/CustomButton";
 import CircleLoader from "../common/CircleLoader";
 
 export default function RegisterForm() {
     const [name, setName] = React.useState("");
-    const [id, setId] = React.useState("");
-    const [idLoading, setIdLoading] = React.useState(false);
-    const [idCorrect, setIdCorrect] = React.useState(false);
-    const [idMessage, setIdMessage] = React.useState("");
+    const [username, setUsername] = React.useState("");
+    const [usernameLoading, setUsernameLoading] = React.useState(false);
+    const [usernameCorrect, setUsernameCorrect] = React.useState(false);
+    const [usernameMessage, setUsernameMessage] = React.useState("");
     const [email, setEmail] = React.useState("");
     const [password, setPassword] = React.useState("");
     const [repeatedPass, setRepeatedPass] = React.useState("");
@@ -19,20 +19,20 @@ export default function RegisterForm() {
     const [error, setError] = React.useState("");
     const [loading, setLoading] = React.useState(false);
 
-    const checkResult = checkRegister(name, id, email, password, repeatedPass);
-    const idCheck = validateIdentifier(id);
+    const checkResult = checkRegister(name, username, email, password, repeatedPass);
+    const usernameCheck = validateUsername(username);
 
     function onNameChange(e: React.ChangeEvent<HTMLInputElement>) {
         setName(e.target.value);
         setError("");
     }
 
-    function onIdChange(e: React.ChangeEvent<HTMLInputElement>) {
-        const id = e.target.value;
-        setId(id);
+    function onUsernameChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const username = e.target.value;
+        setUsername(username);
         setError("");
-        if (validateIdentifier(id).correct) {
-            console.log('Checking id: '+id)
+        if (validateUsername(username).correct) {
+            console.log('Checking id: '+username)
             // Set loading and request api
             // Do not cache!
         }
@@ -70,21 +70,21 @@ export default function RegisterForm() {
                 maxLength={64}
                 onChange={onNameChange}
             />
-            <label className="text-lg">Идентификатор</label>
+            <label className="text-lg">Имя пользователя</label>
             <div className="relative">
                 <CustomInput
                     type="text"
                     placeholder="?????"
-                    value={id}
+                    value={username}
                     maxLength={16}
                     onInput={(e: React.ChangeEvent<HTMLInputElement>) => e.target.value = e.target.value.toLowerCase()}
-                    onChange={onIdChange}
+                    onChange={onUsernameChange}
                 />
-                {idLoading && <div className="absolute left-full top-1 ml-6"><CircleLoader/></div>}
-                {!idLoading && <span
-                    className={"block mx-5 mt-3 max-w-sm " + (idCheck.correct && idCorrect ? "text-green-500" : "text-red-500")}
+                {usernameLoading && <div className="absolute left-full top-1 ml-6"><CircleLoader/></div>}
+                {!usernameLoading && <span
+                    className={"block mx-5 mt-3 max-w-sm " + (usernameCheck.correct && usernameCorrect ? "text-green-500" : "text-red-500")}
                 >
-                {id && idCheck.error ? idCheck.error : idMessage}
+                {username && usernameCheck.error ? usernameCheck.error : usernameMessage}
                 </span>}
             </div>
             <label className="text-lg">Почта</label>
@@ -112,7 +112,7 @@ export default function RegisterForm() {
                 <CustomButton
                     className="mt-2 px-8 py-2"
                     type="submit"
-                    disabled={loading || !checkResult.correct || !idCheck.correct || !idCorrect}
+                    disabled={loading || !checkResult.correct || !usernameCheck.correct || !usernameCorrect}
                 >Зарегистрироваться
                 </CustomButton>
                 {loading && <div className="absolute left-full top-1 ml-6"><CircleLoader/></div>}

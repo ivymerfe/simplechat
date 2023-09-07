@@ -1,7 +1,7 @@
 'use client';
 import { User } from "@/utils/api";
 import EmailEdit from "./EmailEdit";
-import IdentifierEdit from "./IdentifierEdit";
+import UsernameEdit from "./UsernameEdit";
 import InfoEdit from "./InfoEdit";
 import PasswordEdit from "./PasswordEdit";
 
@@ -10,7 +10,7 @@ export default function AccountView() {
     // get user class
     const testUser: User = {
         name: "John",
-        id: "john1234",
+        username: "john1234",
         email: "123@gmail.com",
         avatarUrl: null
     }
@@ -26,8 +26,8 @@ export default function AccountView() {
             </div>
             <div className="flex-initial mx-8 flex flex-col gap-y-6 md:gap-y-12 text-center md:text-left text-lg">
                 <div>
-                    <label className="inline-block mx-auto w-64 align-top">Идентификатор: </label>
-                    <IdentifierEdit user={testUser} />
+                    <label className="inline-block mx-auto w-64 align-top">Имя пользователя: </label>
+                    <UsernameEdit user={testUser} />
                 </div>
                 <div className="mt-4">
                     <label className="inline-block mx-auto w-64 align-top">Почта: </label>

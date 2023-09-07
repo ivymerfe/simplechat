@@ -19,27 +19,27 @@ export function checkLogin(email: string, pass: string): {correct: boolean, erro
     return {correct: true, error: ""}
 }
 
-export function validateIdentifier(id: string) {
-    if (id.length < 4) {
-        return {correct: false, error: "Идентификатор от 4 до 16 символов"}
+export function validateUsername(username: string) {
+    if (username.length < 4) {
+        return {correct: false, error: "Имя пользователя от 4 до 16 символов"}
     }
-    if (id.match(/^\d/)) {
-        return {correct: false, error: "Идентификатор не должен начинаться с цифры"}
+    if (username.match(/^\d/)) {
+        return {correct: false, error: "Имя пользователя не должно начинаться с цифры"}
     }
-    if (id.match(/^_/)) {
-        return {correct: false, error: "Идентификатор не должен начинаться с нижнего подчеркивания"}
+    if (username.match(/^_/)) {
+        return {correct: false, error: "Имя пользователя не должно начинаться с нижнего подчеркивания"}
     }
-    if (!id.match(/^[a-z_0-9]*$/)) {
-        return {correct: false, error: "Идентификатор должен содержать только латинские буквы [a-z], цифры и '_'"}
+    if (!username.match(/^[a-z_0-9]*$/)) {
+        return {correct: false, error: "Имя пользователя должно содержать только латинские буквы [a-z], цифры и '_'"}
     }
     return {correct: true, error: ""}
 }
 
-export function checkRegister(name: string, id: string, email: string, pass: string, reppass: string): {correct: boolean, error: string} {
+export function checkRegister(name: string, username: string, email: string, pass: string, reppass: string): {correct: boolean, error: string} {
     if (!name) {
         return {correct: false, error: ""}
     }
-    if (!id) {
+    if (!username) {
         return {correct: false, error: ""}
     }
     const pre = checkLogin(email, pass);

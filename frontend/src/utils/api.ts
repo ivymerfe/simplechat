@@ -1,13 +1,13 @@
 
 export declare type User = {
     name: string,
-    id: string,
+    username: string,
     email: string,
     avatarUrl: string | null
 }
 
 export declare type OtherUser = {
     name: string,
-    id: string,
+    username: string,
     avatarUrl: string | null
 }

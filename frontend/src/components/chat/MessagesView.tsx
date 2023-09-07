@@ -4,7 +4,7 @@ import Message from "./Message";
 export default function MessagesView(props: {chatUser: OtherUser}) {
     const testUser: OtherUser = {
         name: "Mike",
-        id: "mikee",
+        username: "mikee",
         avatarUrl: "/avatars/k.png"
     }
     const date = new Date();

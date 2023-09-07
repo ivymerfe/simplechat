@@ -13,7 +13,7 @@ export type DialogPreviewProps = {
 export default function DialogPreview({me, user, lastMessage}: DialogPreviewProps) {
     return (
         <div className="h-20 px-4 pt-4 hover:backdrop-brightness-75">
-            <Link href={`/chat/${user.id}`} className="text-black dark:text-white hover:text-black dark:hover:text-white block w-full h-full">
+            <Link href={`/chat/${user.username}`} className="text-black dark:text-white hover:text-black dark:hover:text-white block w-full h-full">
                 <div className="inline-block w-12 h-12 align-top"><Avatar user={user} size={48}/></div>
                 <div className="inline-block w-3/4 ml-3">
                     <div>

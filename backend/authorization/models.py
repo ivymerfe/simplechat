@@ -6,6 +6,7 @@ from django.db.models.signals import post_save
 class User(AbstractUser):
     username = models.CharField(max_length=16, unique=True)
     is_verified = models.BooleanField(default=False)
+    email_code = models.CharField(max_length=6, blank=True)
 
 
 class UserProfile(models.Model):

@@ -21,10 +21,11 @@ export default function SearchBar() {
 
         const testFoundUser: OtherUser = {
             name: "Mike",
-            id: "mikee",
+            username: "mikee",
             avatarUrl: "/avatars/m.png"
         }
         setSearching(true);
+        setSearchResults([]);
         setTimeout(() => {
             const results = Array(5).fill(testFoundUser);
             setSearchResults(results);
@@ -39,6 +40,7 @@ export default function SearchBar() {
                     className="pl-12 py-2 h-10 w-5/6 my-2"
                     placeholder="Поиск..."
                     maxLength={32}
+                    value={searchText}
                     onChange={onSearchTextChange}
                 />
                 <Image
@@ -51,7 +53,7 @@ export default function SearchBar() {
             </div>
             <ul className="absolute top-full left-0 w-full z-50">
                 {searchText && searchResults.length === 0 && <li className="bg-sky-500 dark:bg-sky-700 text-center">{searching ? "..." : "Нет результатов"}</li>}
-                {searchResults.map((user, i) => <li key={i}><SearchResult user={user}/></li>)}
+                {searchText && searchResults.map((user, i) => <li key={i}><SearchResult user={user}/></li>)}
             </ul>
         </div>
     )

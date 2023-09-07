@@ -6,11 +6,11 @@ import Avatar from "../account/Avatar";
 import ChatInput from "./ChatInput";
 import MessagesView from "./MessagesView";
 
-export default function ChatView(props: {userId: string}) {
+export default function ChatView(props: {username: string}) {
     // Get avatar and name of peer user
     const chatUser: OtherUser = {
         name: "Michael",
-        id: props.userId,
+        username: props.username,
         avatarUrl: null
     }
 

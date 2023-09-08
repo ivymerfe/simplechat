@@ -12,6 +12,7 @@ class User(AbstractUser):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
     avatarUrl = models.URLField()
+    dialog_users = models.ManyToManyField(User, related_name='+')
 
 
 def create_user_profile(sender, instance, created, **kwargs):

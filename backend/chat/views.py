@@ -1,3 +1,4 @@
+from asgiref.sync import async_to_sync
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -6,6 +7,7 @@ from authorization.models import User
 from authorization.serializers import OtherUserSerializer
 from .models import Chat, DialogPreview, Message
 from .serializers import *
+from .actions import send_message
 
 # Create your views here.
 
@@ -73,15 +75,5 @@ class SendMessageView(APIView):
         if to_user is None:
             return Response({'detail': 'user_not_found'}, status=400)
         
-        user = request.user
-        user_profile = user.profile
-        to_user_profile = to_user.profile
-        if not to_user_profile.dialog_users.filter(pk=user.pk).exists():
-            to_user_profile.dialog_users.add(user)
-            to_user_profile.save()
-        if not user_profile.dialog_users.filter(pk=to_user.pk).exists():
-            user_profile.dialog_users.add(to_user)
-            user_profile.save()
-        
-        Message.objects.create(from_user=user, to_user=to_user, text=text)
+        send_message(from_user=request.user, to_user=to_user, text=text)
         return Response({'success': True})

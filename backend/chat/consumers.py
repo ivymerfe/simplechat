@@ -10,6 +10,9 @@ class MessagingConsumer(JsonWebsocketConsumer):
 
     def connect(self):
         user = self.scope['user']
+        if not user.is_verified:
+            self.close()
+            return
         group_name = f'user-{user.username}'
         async_to_sync(self.channel_layer.group_add)(group_name, self.channel_name)
         self.groups.append(group_name)

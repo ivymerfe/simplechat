@@ -1,5 +1,5 @@
 'use client';
-import { OtherUser } from "@/utils/api";
+import { OtherUser } from "@/api/user";
 import Image from "next/image";
 import Link from "next/link";
 import Avatar from "../account/Avatar";

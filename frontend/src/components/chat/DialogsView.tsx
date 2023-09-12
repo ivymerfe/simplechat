@@ -1,5 +1,5 @@
 'use client';
-import { OtherUser, User } from "@/utils/api";
+import { OtherUser, User } from "@/api/user";
 import Link from "next/link";
 import Avatar from "../account/Avatar";
 import DialogPreview from "./DialogPreview";

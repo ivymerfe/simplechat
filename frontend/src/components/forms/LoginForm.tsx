@@ -6,13 +6,17 @@ import { checkLogin } from "@/utils/validate";
 import CustomButton from "../common/CustomButton";
 import CircleLoader from "../common/CircleLoader";
 import Link from "next/link";
+import { UserApi } from "@/api/user";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
     const [email, setEmail] = React.useState("");
     const [password, setPassword] = React.useState("");
     const [passVisible, setPassVisible] = React.useState(false);
-    const [error, setError] = React.useState("Неверный пароль");
+    const [error, setError] = React.useState("");
     const [loading, setLoading] = React.useState(false);
+
+    const router = useRouter();
 
     const checkResult = checkLogin(email, password);
 
@@ -30,6 +34,19 @@ export default function LoginForm() {
         e.preventDefault();
         setLoading(true);
         // Request api
+        UserApi.login(email, password).then((result) => {
+            setLoading(false);
+            if (!result.success) {
+                if (result.error === 'bad_credentials') {
+                    setError("Неверный логин или пароль");
+                } else {
+                    setError("Неизвестная ошибка (в консоли)");
+                    console.log(result.error);
+                }
+            } else {
+                router.push("/chat")
+            }
+        })
     }
 
     return (

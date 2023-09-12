@@ -1,5 +1,5 @@
 'use client';
-import { User } from "@/utils/api";
+import { User } from "@/api/user";
 import React from "react";
 import Avatar from "./Avatar";
 import './InfoEdit.css';

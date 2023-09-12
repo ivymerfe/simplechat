@@ -2,7 +2,7 @@ from asgiref.sync import async_to_sync
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from authorization.validators import UsernameValidator
+from authorization.permissions import IsVerified
 from authorization.models import User
 from authorization.serializers import OtherUserSerializer
 from .models import Chat, DialogPreview, Message
@@ -13,7 +13,7 @@ from .actions import send_message
 
 
 class FindUserView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsVerified)
 
     def post(self, request):
         name_or_username = request.data.get('query', '').strip()
@@ -33,7 +33,7 @@ class FindUserView(APIView):
 
 
 class DialogsView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsVerified)
 
     def get(self, request):
         user = request.user
@@ -47,7 +47,7 @@ class DialogsView(APIView):
 
 
 class ChatView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsVerified)
 
     def get(self, request):
         user = request.user
@@ -63,7 +63,7 @@ class ChatView(APIView):
 
 
 class SendMessageView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsVerified)
 
     def post(self, request):
         serializer = SendMessageSerializer(data=request.data)

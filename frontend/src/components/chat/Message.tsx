@@ -1,4 +1,4 @@
-import { OtherUser, User } from "@/utils/api"
+import { OtherUser, User } from "@/api/user"
 import formatDate from "@/utils/dateformat";
 import Avatar from "../account/Avatar"
 

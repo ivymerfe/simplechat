@@ -1,4 +1,4 @@
-import { OtherUser } from "@/utils/api";
+import { OtherUser } from "@/api/user";
 import Message from "./Message";
 
 export default function MessagesView(props: {chatUser: OtherUser}) {

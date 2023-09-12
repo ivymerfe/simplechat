@@ -1,4 +1,4 @@
-import type { OtherUser, User } from "@/utils/api";
+import type { OtherUser, User } from "@/api/user";
 import Image from "next/image";
 
 export default function Avatar(props: {user: User | OtherUser, size: number}) {

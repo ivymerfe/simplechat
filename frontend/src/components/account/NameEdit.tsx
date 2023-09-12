@@ -1,4 +1,4 @@
-import { User } from "@/utils/api";
+import { User } from "@/api/user";
 import React from "react";
 import './NameEdit.css';
 

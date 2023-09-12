@@ -1,4 +1,4 @@
-import { OtherUser } from "@/utils/api";
+import { OtherUser } from "@/api/user";
 import Avatar from "@/components/account/Avatar";
 import Link from "next/link";
 

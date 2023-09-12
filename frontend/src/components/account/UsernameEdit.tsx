@@ -1,5 +1,5 @@
 'use client';
-import { User } from "@/utils/api";
+import { User } from "@/api/user";
 import { validateUsername } from "@/utils/validate";
 import React from "react";
 import CircleLoader from "../common/CircleLoader";

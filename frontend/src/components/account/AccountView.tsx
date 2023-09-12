@@ -1,5 +1,5 @@
 'use client';
-import { User } from "@/utils/api";
+import { User } from "@/api/user";
 import EmailEdit from "./EmailEdit";
 import UsernameEdit from "./UsernameEdit";
 import InfoEdit from "./InfoEdit";

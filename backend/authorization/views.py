@@ -1,8 +1,6 @@
-from rest_framework.exceptions import APIException, ErrorDetail
-from rest_framework.generics import CreateAPIView
+from rest_framework.exceptions import APIException
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 
@@ -16,12 +14,12 @@ class EmailTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
 
-class RegisterView(CreateAPIView):
+class RegisterView(APIView):
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
 
-    def create(self, request):
-        serializer = self.get_serializer(data=request.data)
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"success": True})
@@ -49,6 +47,9 @@ class SendCodeView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
+        if request.user.is_verified:
+            return Response({"detail": "already_verified"}, status=400)
+        
         code = ''.join(str(randint(0, 9)) for _ in range(6))
         # Send email
         request.user.email_code = code
@@ -64,7 +65,7 @@ class CheckCodeView(APIView):
         serializer.is_valid(raise_exception=True)
         code = serializer.validated_data.get('code')
         # Do not check
-        request.user.is_active = True
+        request.user.is_verified = True
         request.user.save()
         return Response({"success": True})
 
@@ -160,6 +161,8 @@ class PasswordResetView(APIView):
                 raise APIException("No user associated with this email", "user_not_found")
             # Send code to email
             return Response({"success": True, "message": "Email code sent."})
+        if 'new_password' not in serializer.validated_data:
+            raise APIException("Password is required", "no_password")
         
         email_code = serializer.validated_data['email_code']
         new_password = serializer.validated_data['new_password']

@@ -38,23 +38,23 @@ export class UserApi {
 
     static async register(username: string, email: string, password: string, name: string) {
         try {
-            await axiosInstance.post("auth/register/", { username, email, password, name });
+            const rs = await axiosInstance.post("auth/register/", { username, email, password, name });
             return {success: true}
         } catch (e) {
-            return {success: true, error: e}
+            return {success: false, error: e}
         }
     }
 
-    static async authorizedGet(url: string, data?: any) {
+    static async authorizedGet(url: string) {
         try {
-            const rs = await axiosInstance.get(url, data);
+            const rs = await axiosInstance.get(url);
             return {success: true, data: rs.data}
         } catch (e: any) {
-            if (e.response?.status === 400) {
+            if (e.response?.status === 401) {
                 UserApi.logout();
                 return {success: false, error: "unauthorized"}
             }
-            return {success: false, error: e}
+            return {success: false, data: e.response?.data, error: e}
         }
     }
 
@@ -63,21 +63,33 @@ export class UserApi {
             const rs = await axiosInstance.post(url, data);
             return {success: true, data: rs.data}
         } catch (e: any) {
-            if (e.response?.status === 400) {
+            if (e.response?.status === 401) {
                 UserApi.logout();
                 return {success: false, error: "unauthorized"}
             }
-            return {success: false, error: e}
+            return {success: false, data: e.response?.data, error: e}
         }
     }
 
-    static async getMe() {
-        return await UserApi.authorizedGet("auth/me/");
+    static async getMe(): Promise<User> {
+        try {
+            const rs = await UserApi.authorizedGet("auth/me/");
+            if (!rs.data) throw "unauthorized";
+            const user = rs.data;
+            return {
+                name: user.name,
+                username: user.username,
+                email: user.email,
+                avatarUrl: user.avatarUrl
+            }
+        } catch {
+            throw "unauthorized";
+        }
     }
 
     static async checkUsername(username: string) {
         try {
-            return await axiosInstance.post("auth/check_username/", { username });
+            return {response: await axiosInstance.post("auth/check_username/", { username })};
         } catch (e: any) {
             if (e.response?.status === 400) {
                 return {error: 'invalid_username'}
@@ -110,7 +122,7 @@ export class UserApi {
         return await UserApi.authorizedPost("auth/change_password/", { new_password, old_password });
     }
 
-    static async changeEmail(new_email: string, email_code?: string) {
+    static async changeEmail(new_email?: string, email_code?: string) {
         return await UserApi.authorizedPost("auth/change_email/", { new_email, email_code });
     }
 

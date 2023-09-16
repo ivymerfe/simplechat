@@ -1,7 +1,9 @@
 'use client';
-import { User } from "@/api/user";
+import { mapErrors } from "@/api/errors";
+import { User, UserApi } from "@/api/user";
 import { validateUsername } from "@/utils/validate";
 import React from "react";
+import { useSWRConfig } from "swr";
 import CircleLoader from "../common/CircleLoader";
 import CustomButton from "../common/CustomButton";
 import CustomInput from "../common/CustomInput";
@@ -13,6 +15,8 @@ export default function UsernameEdit(props: {user: User}) {
     const [message, setMessage] = React.useState("");
     const [loading, setLoading] = React.useState(false);
 
+    const { mutate } = useSWRConfig();
+
     const check = validateUsername(username);
 
     function onUsernameChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -23,12 +27,28 @@ export default function UsernameEdit(props: {user: User}) {
             setCorrect(false);
             setMessage("");
 
-            // Check if available
-            setTimeout(() => {
+            UserApi.checkUsername(username).then(({response, error}) => {
                 setLoading(false);
-                setCorrect(true);
-                setMessage("Свободен!");
-            }, 1000);
+                if (error) {
+                    if (error === 'invalid_username') {
+                        setMessage("Некорректное имя пользователя")
+                    } else {
+                        setMessage(mapErrors(error));
+                    }
+                } else {
+                    if (response?.data?.used === false) {
+                        setCorrect(true);
+                        setMessage("Имя пользователя свободно!");
+                    } else if (response?.data?.used) {
+                        setCorrect(false);
+                        setMessage("Имя пользователя занято!");
+                    } else {
+                        setCorrect(false);
+                        setMessage("Неправильный ответ сервера");
+                        console.error(response);
+                    }
+                }
+            });
         }
     }
 
@@ -41,7 +61,17 @@ export default function UsernameEdit(props: {user: User}) {
             if (!username || username === props.user.username) {
                 setUsername(props.user.username);
             } else {
-                // Submit new identifier
+                setLoading(true);
+                UserApi.changeUsername(username).then(({success, error}) => {
+                    setLoading(false);
+                    if (success) {
+                        mutate("user");
+                        setEditing(false);
+                    } else {
+                        setCorrect(false);
+                        setMessage(mapErrors(error));
+                    }
+                });
             }
         }
     }

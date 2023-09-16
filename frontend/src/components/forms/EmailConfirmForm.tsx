@@ -1,9 +1,12 @@
 'use client';
-import { User } from "@/api/user";
-import React, { useState } from "react";
+import { mapErrors } from "@/api/errors";
+import { User, UserApi } from "@/api/user";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import CircleLoader from "../common/CircleLoader";
 import CodeInput from "../common/CodeInput";
 import TimerButton from "../common/TimerButton";
+import useSWR from 'swr';
 
 export default function EmailConfirmForm() {
     const [code, setCode] = useState("");
@@ -11,8 +14,12 @@ export default function EmailConfirmForm() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    // Get user from api
-    const email = "123@gmail.com";
+    const router = useRouter();
+
+    const userCache = useSWR("user", UserApi.getMe);
+    const email = userCache.data?.email || "";
+
+    useEffect(() => resendCode(), []);
 
     function onCodeChange(e: React.ChangeEvent<HTMLInputElement>) {
         const code = e.target.value;
@@ -28,21 +35,40 @@ export default function EmailConfirmForm() {
     }
 
     function resendCode() {
-        // request api
+        UserApi.sendCode().then(({success, data, error}) => {
+            if (!success) {
+                if (error === "unauthorized") {
+                    router.push('/login')
+                }
+                else if (data?.errors?.includes("already_verified")) {
+                    router.push('/chat');
+                } else {
+                    setError(mapErrors(error));
+                }
+            }
+        });
         setTimerSeconds(30);
     }
 
     function submitCode(code: string) {
         console.log('Code: ' + code);
         setLoading(true);
+        UserApi.checkCode(code).then(({success, error}) => {
+            if (success) {
+                router.push('/chat');
+            }
+            else {
+                setError(mapErrors(error));
+            }
+        });
     }
 
     return (
         <div className="mx-auto px-8">
-            <div className="text-lg">
+            {email && <div className="text-lg">
                 <span>На адрес </span><span className="text-slate-700 dark:text-slate-300">{email}</span><span> пришел код для подтверждения.</span>
                 <span className="block">Введи его ниже.</span>
-            </div>
+            </div>}
             <div className="relative mt-12 mx-auto w-fit">
                 <CodeInput
                     value={code}

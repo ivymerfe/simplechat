@@ -1,5 +1,5 @@
 'use client'
-import React from "react";
+import React, { useEffect } from "react";
 import CustomInput from "../common/CustomInput";
 import PasswordInput from "../common/PasswordInput";
 import { checkLogin } from "@/utils/validate";
@@ -8,6 +8,8 @@ import CircleLoader from "../common/CircleLoader";
 import Link from "next/link";
 import { UserApi } from "@/api/user";
 import { useRouter } from "next/navigation";
+import useSWR from 'swr';
+import TokenService from "@/api/token";
 
 export default function LoginForm() {
     const [email, setEmail] = React.useState("");
@@ -17,6 +19,10 @@ export default function LoginForm() {
     const [loading, setLoading] = React.useState(false);
 
     const router = useRouter();
+    const userCache = useSWR("user", UserApi.getMe);
+    if (userCache.data && TokenService.getAccessToken()) { // logout fix
+        router.push('/chat');
+    }
 
     const checkResult = checkLogin(email, password);
 
@@ -33,15 +39,15 @@ export default function LoginForm() {
     function onSubmit(e: React.FormEvent) {
         e.preventDefault();
         setLoading(true);
-        // Request api
-        UserApi.login(email, password).then((result) => {
+        
+        UserApi.login(email, password).then(({success, error}) => {
             setLoading(false);
-            if (!result.success) {
-                if (result.error === 'bad_credentials') {
+            if (!success) {
+                if (error === 'bad_credentials') {
                     setError("Неверный логин или пароль");
                 } else {
                     setError("Неизвестная ошибка (в консоли)");
-                    console.log(result.error);
+                    console.log(error);
                 }
             } else {
                 router.push("/chat")

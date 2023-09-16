@@ -10,6 +10,10 @@ from random import randint
 
 # Create your views here.
 
+def wrap_errors(errors):
+    return Response({"errors": [f"{key}:{detail.code}" for key, errors in errors.items() for detail in errors]}, status=400)
+
+
 class EmailTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
@@ -20,9 +24,10 @@ class RegisterView(APIView):
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid():
+            return wrap_errors(serializer.errors)
         serializer.save()
-        return Response({"success": True})
+        return Response()
 
 
 class MyselfView(APIView):
@@ -36,9 +41,10 @@ class MyselfView(APIView):
 class CheckUsernameView(APIView):
     permission_classes = (AllowAny,)
 
-    def get(self, request):
+    def post(self, request):
         serializer = UsernameSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid():
+            return wrap_errors(serializer.errors)
         used = User.objects.filter(username=serializer.validated_data.get('username')).exists()
         return Response({"used": used})
 
@@ -48,13 +54,13 @@ class SendCodeView(APIView):
 
     def post(self, request):
         if request.user.is_verified:
-            return Response({"detail": "already_verified"}, status=400)
+            return Response({"errors": ["already_verified"]}, status=400)
         
         code = ''.join(str(randint(0, 9)) for _ in range(6))
         # Send email
         request.user.email_code = code
         request.user.save()
-        return Response({"success": True})
+        return Response()
 
 
 class CheckCodeView(APIView):
@@ -62,12 +68,13 @@ class CheckCodeView(APIView):
 
     def post(self, request):
         serializer = EmailCodeSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid():
+            return wrap_errors(serializer.errors)
         code = serializer.validated_data.get('code')
         # Do not check
         request.user.is_verified = True
         request.user.save()
-        return Response({"success": True})
+        return Response()
 
 
 class ChangeNameView(APIView):
@@ -75,12 +82,13 @@ class ChangeNameView(APIView):
 
     def post(self, request):
         serializer = NameSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid():
+            return wrap_errors(serializer.errors)
 
         name = serializer.validated_data['name']
         request.user.first_name = name
         request.user.save()
-        return Response({"success": True})
+        return Response()
 
 
 class ChangeAvatarView(APIView):
@@ -88,12 +96,13 @@ class ChangeAvatarView(APIView):
 
     def post(self, request):
         serializer = AvatarURLSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        avatarUrl = serializer.validated_data['avatarUrl']
+        if not serializer.is_valid():
+            return wrap_errors(serializer.errors)
+        
+        avatarUrl = serializer.validated_data.get('avatarUrl', '')
         request.user.profile.avatarUrl = avatarUrl
         request.user.profile.save()
-        return Response({"success": True})
+        return Response()
 
 
 class ChangeUsernameView(APIView):
@@ -101,15 +110,16 @@ class ChangeUsernameView(APIView):
 
     def post(self, request):
         serializer = UsernameSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid():
+            return wrap_errors(serializer.errors)
 
         username = serializer.validated_data.get('username')
         used = User.objects.filter(username=username).exists()
         if used:
-            return Response({"username": ['already_used']}, status=400)
+            return Response({"errors": ['username:already_used']}, status=400)
         request.user.username = username
         request.user.save()
-        return Response({"success": True})
+        return Response()
 
 
 class ChangePasswordView(APIView):
@@ -117,16 +127,17 @@ class ChangePasswordView(APIView):
 
     def post(self, request):
         serializer = ChangePasswordSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid():
+            return wrap_errors(serializer.errors)
 
         new_password = serializer.validated_data['new_password']
         old_password = serializer.validated_data['old_password']
         if not request.user.check_password(old_password):
-            raise APIException("Old password is not correct", code="invalid_old_password")
+            return Response({"errors": ["invalid_old_password"]}, status=400)
         
         request.user.set_password(new_password)
         request.user.save()
-        return Response({"success": True})
+        return Response()
 
 
 class ChangeEmailView(APIView):
@@ -134,40 +145,43 @@ class ChangeEmailView(APIView):
 
     def post(self, request):
         serializer = ChangeEmailSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
+        if not serializer.is_valid():
+            return wrap_errors(serializer.errors)
+        
         if 'email_code' not in serializer.validated_data:
             # Send code to email
-            return Response({"success": True, "message": "Email code sent."})
+            return Response({"message": "Email code sent."})
+        if 'new_email' not in serializer.validated_data:
+            return Response({"errors": ["email:blank"]}, status=400)
         
         new_email = serializer.validated_data['new_email']
         # Dont check code
         request.user.email = new_email
         request.user.save()
-        return Response({"success": True})
+        return Response()
 
 
 class PasswordResetView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
 
     def post(self, request):
         serializer = PasswordResetSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid():
+            return wrap_errors(serializer.errors)
 
         email = serializer.validated_data['email']
         user = User.objects.filter(email=email).first()
         if 'email_code' not in serializer.validated_data:
             if user is None:
-                raise APIException("No user associated with this email", "user_not_found")
+                return Response({"errors": ["user_not_found"]}, status=400)
             # Send code to email
-            return Response({"success": True, "message": "Email code sent."})
+            return Response({"message": "Email code sent."})
         if 'new_password' not in serializer.validated_data:
-            raise APIException("Password is required", "no_password")
+            return Response({"errors": ["password:blank"]}, status=400)
         
         email_code = serializer.validated_data['email_code']
         new_password = serializer.validated_data['new_password']
         # Dont check code
         user.set_password(new_password)
         user.save()
-        return Response({"success": True})
-
+        return Response()

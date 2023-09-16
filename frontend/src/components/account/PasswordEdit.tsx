@@ -1,5 +1,6 @@
 'use client';
-import { User } from "@/api/user";
+import { mapErrors } from "@/api/errors";
+import { User, UserApi } from "@/api/user";
 import { checkPasswordChange } from "@/utils/validate";
 import React from "react";
 import CircleLoader from "../common/CircleLoader";
@@ -40,12 +41,18 @@ export default function PasswordEdit(props: {user: User}) {
                 setEditing(false);
                 return;
             }
-            // Send new password
             setLoading(true);
-            setTimeout(() => {
-                setError("error");
+            UserApi.changePassword(newPass, oldPassword).then(({success, error}) => {
                 setLoading(false);
-            }, 1000)
+                if (success) {
+                    setEditing(false);
+                    setNewPass("");
+                    setRepeatedNewPass("");
+                    setOldPass("");
+                } else {
+                    setError(mapErrors(error));
+                }
+            })
         }
     }
 

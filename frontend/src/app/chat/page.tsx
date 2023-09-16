@@ -1,3 +1,5 @@
+"use client";
+
 import DialogsView from "@/components/chat/DialogsView";
 
 export default function DialogsPage() {

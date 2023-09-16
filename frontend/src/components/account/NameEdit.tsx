@@ -1,10 +1,12 @@
-import { User } from "@/api/user";
+import { User, UserApi } from "@/api/user";
 import React from "react";
+import { useSWRConfig } from "swr";
 import './NameEdit.css';
 
 export default function NameEdit(props: {user: User}) {
     const [name, setName] = React.useState(props.user.name);
     const [editingName, setEditingName] = React.useState(false);
+    const { mutate } = useSWRConfig();
 
     function fixNameSize(e: React.ChangeEvent<HTMLInputElement>) {
         e.target.style.width = Math.min(20, e.target.value.length) + 'ch';
@@ -12,7 +14,6 @@ export default function NameEdit(props: {user: User}) {
 
     function onNameChange(e: React.ChangeEvent<HTMLInputElement>) {
         setName(e.target.value);
-
     }
 
     function onKeyUp(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -29,7 +30,14 @@ export default function NameEdit(props: {user: User}) {
         if (!newName) {
             setName(props.user.name);
         } else {
-            // Send new name to api and update user.name
+            UserApi.changeName(newName).then(({success, error}) => {
+                if (success) {
+                    mutate("user");
+                } else {
+                    setName(props.user.name);
+                    console.error(error);
+                }
+            })
         }
         setEditingName(false);
     }

@@ -1,13 +1,13 @@
+import { Message } from "@/api/chat"
 import type { OtherUser, User } from "@/api/user"
 import formatDate from "@/utils/dateformat"
 import Link from "next/link"
 import Avatar from "../account/Avatar"
-import { MessageProps } from "./Message"
 
 export type DialogPreviewProps = {
     me: User,
     user: User | OtherUser,
-    lastMessage: MessageProps | null
+    lastMessage: Message
 }
 
 export default function DialogPreview({me, user, lastMessage}: DialogPreviewProps) {

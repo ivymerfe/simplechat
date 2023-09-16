@@ -1,7 +1,9 @@
 'use client';
-import { User } from "@/api/user";
+import { mapErrors } from "@/api/errors";
+import { User, UserApi } from "@/api/user";
 import { checkEmailChange } from "@/utils/validate";
 import React from "react";
+import { useSWRConfig } from "swr";
 import CircleLoader from "../common/CircleLoader";
 import CodeInput from "../common/CodeInput";
 import CustomButton from "../common/CustomButton";
@@ -15,6 +17,8 @@ export default function EmailEdit(props: {user: User}) {
     const [error, setError] = React.useState("");
     const [emailCode, setEmailCode] = React.useState("");
     const [timerSeconds, setTimerSeconds] = React.useState(30);
+
+    const { mutate } = useSWRConfig();
 
     const check = checkEmailChange(email, emailCode);
 
@@ -32,24 +36,30 @@ export default function EmailEdit(props: {user: User}) {
     function buttonAction() {
         if (!editing) {
             setEditing(true);
-            // Send code
+            resendCode();
         } else {
             if (!email || email === props.user.email) {
                 setEmail(props.user.email);
                 setEditing(false);
             } else {
-                // Change email
                 setLoading(true);
-                setTimeout(() => {
-                    setError("dddd");
+                UserApi.changeEmail(email, emailCode).then(({success, error}) => {
                     setLoading(false);
-                }, 1000);
+                    if (success) {
+                        mutate("user");
+                        setEditing(false);
+                    } else {
+                        setError(mapErrors(error));
+                    }
+                })
             }
         }
     }
 
     function resendCode() {
-        // api
+        UserApi.changeEmail().then(({success, error}) => {
+            if (!success) setError(mapErrors(error));
+        });
         setTimerSeconds(30);
     }
 
@@ -83,7 +93,6 @@ export default function EmailEdit(props: {user: User}) {
                     value={email}
                     disabled={!editing}
                     onChange={onEmailChange}
-                    maxLength={16}
                 />
                 <div className="relative inline-block">
                     <CustomButton

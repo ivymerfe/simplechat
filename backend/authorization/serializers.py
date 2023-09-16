@@ -84,21 +84,21 @@ class NameSerializer(serializers.Serializer):
 
 
 class AvatarURLSerializer(serializers.Serializer):
-    avatarUrl = serializers.URLField()
+    avatarUrl = serializers.URLField(required=False)
 
 
 class ChangePasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(write_only=True, validators=[validate_password])
-    old_password = serializers.CharField(write_only=True, validators=[validate_password])
+    old_password = serializers.CharField(write_only=True)
 
 
 class ChangeEmailSerializer(serializers.Serializer):
-    new_email = serializers.EmailField()
+    new_email = serializers.EmailField(required=False)
     email_code = serializers.CharField(required=False, validators=[EmailCodeValidator()])
 
     def validate_new_email(self, new_email):
         if (User.objects.filter(email=new_email).exists()):
-            raise ValidationError("Email already in use.", "email_already_used")
+            raise ValidationError("Email already in use.", "used")
         return new_email
 
 

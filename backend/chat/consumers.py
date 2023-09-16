@@ -9,14 +9,18 @@ class MessagingConsumer(JsonWebsocketConsumer):
     username_validator = UsernameValidator()
 
     def connect(self):
+        self.accept()
+        if self.scope['user'].is_anonymous:
+            self.close(code=4001)
+            return
+        
         user = self.scope['user']
         if not user.is_verified:
-            self.close()
+            self.close(code=4002)
             return
         group_name = f'user-{user.username}'
         async_to_sync(self.channel_layer.group_add)(group_name, self.channel_name)
         self.groups.append(group_name)
-        self.accept()
     
     def error(self, error):
         self.send_json(content={'error': error})

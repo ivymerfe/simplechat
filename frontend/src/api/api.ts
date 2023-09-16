@@ -29,7 +29,7 @@ axiosInstance.interceptors.response.use(
     async (err) => {
         const originalConfig = err.config;
         // Access Token was expired
-        if (err.response && err.response.status === 401 && !originalConfig._retry && TokenService.getRefreshToken()) {
+        if (err.response && err.response.status === 401 && !originalConfig._retry && originalConfig.url !== "/auth/token/refresh/" && TokenService.getRefreshToken()) {
             originalConfig._retry = true;
             try {
                 const rs = await axiosInstance.post("/auth/token/refresh/", {

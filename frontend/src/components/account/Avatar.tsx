@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export default function Avatar(props: {user: User | OtherUser, size: number}) {
     const user = props.user;
-    const url = user.avatarUrl ?? '/icons/user.svg';
+    const url = user.avatarUrl ? user.avatarUrl : '/icons/user.svg';
     var imgClass = "mx-auto rounded-full text-center";
     if (!user.avatarUrl) {
         imgClass += " dark:invert";

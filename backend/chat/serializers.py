@@ -6,7 +6,7 @@ from .models import Message
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username', read_only=True)
+    username = serializers.CharField(source='from_user.username', read_only=True)
 
     class Meta:
         model = Message

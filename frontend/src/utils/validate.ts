@@ -101,5 +101,8 @@ export function checkPasswordChange(newPass: string, newPassRep: string, oldPass
     if (oldPass.length < 8) {
         return {correct: false, error: "Старый пароль как минимум 8 символов"}
     }
+    if (newPass === oldPass) {
+        return {correct: false, error: "Новый и старый пароль совпадают"}
+    }
     return {correct: true, error: ""}
 }

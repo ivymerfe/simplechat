@@ -5,6 +5,11 @@ import PasswordInput from "../common/PasswordInput";
 import { validateUsername, checkRegister } from "@/utils/validate";
 import CustomButton from "../common/CustomButton";
 import CircleLoader from "../common/CircleLoader";
+import { UserApi } from "@/api/user";
+import { mapErrors } from "@/api/errors";
+import { useRouter } from "next/navigation";
+import useSWR from 'swr';
+import TokenService from "@/api/token";
 
 export default function RegisterForm() {
     const [name, setName] = React.useState("");
@@ -19,6 +24,12 @@ export default function RegisterForm() {
     const [error, setError] = React.useState("");
     const [loading, setLoading] = React.useState(false);
 
+    const router = useRouter();
+    const userCache = useSWR("user", UserApi.getMe);
+    if (userCache.data && TokenService.getAccessToken()) { // logout fix
+        router.push('/chat');
+    }
+
     const checkResult = checkRegister(name, username, email, password, repeatedPass);
     const usernameCheck = validateUsername(username);
 
@@ -32,9 +43,31 @@ export default function RegisterForm() {
         setUsername(username);
         setError("");
         if (validateUsername(username).correct) {
-            console.log('Checking id: '+username)
-            // Set loading and request api
-            // Do not cache!
+            console.log('Checking id: '+username);
+            setUsernameLoading(true);
+            setUsernameCorrect(false);
+            UserApi.checkUsername(username).then(({response, error}) => {
+                setUsernameLoading(false);
+                if (error) {
+                    if (error === 'invalid_username') {
+                        setUsernameMessage("Некорректное имя пользователя")
+                    } else {
+                        setUsernameMessage(mapErrors(error));
+                    }
+                } else {
+                    if (response?.data?.used === false) {
+                        setUsernameCorrect(true);
+                        setUsernameMessage("Имя пользователя свободно!");
+                    } else if (response?.data?.used) {
+                        setUsernameCorrect(false);
+                        setUsernameMessage("Имя пользователя занято!");
+                    } else {
+                        setUsernameCorrect(false);
+                        setUsernameMessage("Неправильный ответ сервера");
+                        console.error(response);
+                    }
+                }
+            });
         }
     }
 
@@ -56,8 +89,21 @@ export default function RegisterForm() {
     function onSubmit(e: React.FormEvent) {
         e.preventDefault();
         setLoading(true);
-        // Request api
-        console.log(password)
+        UserApi.register(username, email, password, name).then(({success, error}) => {
+            if (success) {
+                UserApi.login(email, password).then(({success, error}) => {
+                    if (success) {
+                        router.push('/emailconfirm');
+                    } else {
+                        setLoading(false);
+                        setError(mapErrors(error));
+                    }
+                })
+            } else {
+                setLoading(false);
+                setError(mapErrors(error));
+            }
+        })
     }
 
     return (

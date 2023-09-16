@@ -1,41 +1,45 @@
 'use client';
-import { User } from "@/api/user";
+import { User, UserApi } from "@/api/user";
 import EmailEdit from "./EmailEdit";
 import UsernameEdit from "./UsernameEdit";
 import InfoEdit from "./InfoEdit";
 import PasswordEdit from "./PasswordEdit";
+import { useRouter } from "next/navigation";
+import useSWR from 'swr';
 
 export default function AccountView() {
-    // get data from swr
-    // get user class
-    const testUser: User = {
-        name: "John",
-        username: "john1234",
-        email: "123@gmail.com",
-        avatarUrl: null
+    const router = useRouter();
+    const userCache = useSWR("user", UserApi.getMe);
+    if (userCache.error === "unauthorized" && !userCache.data) {  // not undefined == no user
+        router.push('/login');
+        return <div></div>;
     }
+    if (!userCache.data) return <div></div>;
+    const user = userCache.data;
+    console.log(user);
 
     function logout() {
-        // Call api
+        UserApi.logout();
+        router.push('/login');
     }
 
     return (
         <div className="mb-16 flex flex-col md:flex-row gap-32 justify-center items-center md:items-start">
             <div className="flex-initial mx-16">
-                <InfoEdit user={testUser} avatarSize={150} />
+                <InfoEdit user={user} avatarSize={150} />
             </div>
             <div className="flex-initial mx-8 flex flex-col gap-y-6 md:gap-y-12 text-center md:text-left text-lg">
                 <div>
                     <label className="inline-block mx-auto w-64 align-top">Имя пользователя: </label>
-                    <UsernameEdit user={testUser} />
+                    <UsernameEdit user={user} />
                 </div>
                 <div className="mt-4">
                     <label className="inline-block mx-auto w-64 align-top">Почта: </label>
-                    <EmailEdit user={testUser} />
+                    <EmailEdit user={user} />
                 </div>
                 <div className="mt-4">
                     <label className="inline-block mx-auto w-64 align-top">Пароль: </label>
-                    <PasswordEdit user={testUser} />
+                    <PasswordEdit user={user} />
                 </div>
                 <div className="mt-12">
                     <button

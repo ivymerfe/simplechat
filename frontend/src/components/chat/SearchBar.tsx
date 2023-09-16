@@ -1,4 +1,5 @@
 'use client';
+import { ChatApi } from "@/api/chat";
 import { OtherUser } from "@/api/user";
 import Image from "next/image";
 import React from "react";
@@ -17,20 +18,16 @@ export default function SearchBar() {
             setSearchResults([]);
             return;
         }
-        // Query api and set results (max = 5)
-
-        const testFoundUser: OtherUser = {
-            name: "Mike",
-            username: "mikee",
-            avatarUrl: "/avatars/m.png"
-        }
         setSearching(true);
         setSearchResults([]);
-        setTimeout(() => {
-            const results = Array(5).fill(testFoundUser);
-            setSearchResults(results);
+        ChatApi.findUsers(searchText).then(({success, data, error}) => {
             setSearching(false);
-        }, 1000);
+            if (!success) {
+                console.error(error);
+            } else {
+                setSearchResults(data);
+            }
+        })
     }
 
     return (

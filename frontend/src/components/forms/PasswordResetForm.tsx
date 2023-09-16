@@ -7,6 +7,11 @@ import TimerButton from "../common/TimerButton";
 import CodeInput from "../common/CodeInput";
 import PasswordInput from "../common/PasswordInput";
 import { checkPasswordReset, validateEmail } from "@/utils/validate";
+import { UserApi } from "@/api/user";
+import { mapErrors } from "@/api/errors";
+import { useRouter } from "next/navigation";
+import useSWR from 'swr';
+import TokenService from "@/api/token";
 
 export default function PasswordResetForm() {
     const [email, setEmail] = useState("");
@@ -18,6 +23,12 @@ export default function PasswordResetForm() {
     const [passVisible, setPassVisible] = useState(false);
     const [password, setPassword] = useState("");
     const [repeatedPass, setRepeatedPass] = useState("");
+
+    const router = useRouter();
+    const userCache = useSWR("user", UserApi.getMe);
+    if (userCache.data && TokenService.getAccessToken()) { // logout fix
+        router.push('/chat');
+    }
 
     const emailCorrect = email && validateEmail(email);
     const formCheck = checkPasswordReset(emailCode, password, repeatedPass);
@@ -34,9 +45,40 @@ export default function PasswordResetForm() {
     function onSubmit() {
         // Request api: check if exists and send code
         // Also set loading
-        setEmailAccepted(true);
+        if (!emailAccepted) {
+            setLoading(true)
+            UserApi.passwordReset(email).then(({success, error}) => {
+                setLoading(false);
+                if (success) {
+                    setEmailAccepted(true);
+                } else {
+                    setError(mapErrors(error));
+                }
+            });
+            return
+        }
         setLoading(true);
-        // If email already accepted, send data
+        UserApi.passwordReset(email, password, emailCode).then(({success, error}) => {
+            if (success) {
+                setError("Пароль изменен. Авторизуюсь...")
+                UserApi.login(email, password).then(({success, error}) => {
+                    setLoading(false);
+                    if (!success) {
+                        if (error === 'bad_credentials') {
+                            setError("Неверный логин или пароль");
+                        } else {
+                            setError("Неизвестная ошибка (в консоли)");
+                            console.log(error);
+                        }
+                    } else {
+                        router.push("/chat")
+                    }
+                })
+            } else {
+                setLoading(false);
+                setError(mapErrors(error));
+            }
+        });
     }
 
     function onCodeChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -46,7 +88,11 @@ export default function PasswordResetForm() {
     }
 
     function resendCode() {
-        // request api
+        UserApi.passwordReset(email).then(({success, error}) => {
+            if (!success) {
+                setError(mapErrors(error));
+            }
+        });
         setTimerSeconds(30);
     }
 

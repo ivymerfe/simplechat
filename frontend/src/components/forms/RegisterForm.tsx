@@ -8,7 +8,7 @@ import CircleLoader from "../common/CircleLoader";
 import { UserApi } from "@/api/user";
 import { mapErrors } from "@/api/errors";
 import { useRouter } from "next/navigation";
-import useSWR from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import TokenService from "@/api/token";
 
 export default function RegisterForm() {
@@ -29,6 +29,7 @@ export default function RegisterForm() {
     if (userCache.data && TokenService.getAccessToken()) { // logout fix
         router.push('/chat');
     }
+    const { mutate } = useSWRConfig();
 
     const checkResult = checkRegister(name, username, email, password, repeatedPass);
     const usernameCheck = validateUsername(username);
@@ -86,13 +87,13 @@ export default function RegisterForm() {
         setError("");
     }
 
-    function onSubmit(e: React.FormEvent) {
-        e.preventDefault();
+    function submit() {
         setLoading(true);
         UserApi.register(username, email, password, name).then(({success, error}) => {
             if (success) {
                 UserApi.login(email, password).then(({success, error}) => {
                     if (success) {
+                        mutate("user");
                         router.push('/emailconfirm');
                     } else {
                         setLoading(false);
@@ -103,11 +104,16 @@ export default function RegisterForm() {
                 setLoading(false);
                 setError(mapErrors(error));
             }
-        })
+        });
     }
 
+    const disableForm = loading || !checkResult.correct || !usernameCheck.correct || !usernameCorrect;
     return (
-        <form onSubmit={onSubmit} className="flex flex-col items-center gap-4">
+        <form
+            onSubmit={(e: React.FormEvent) => e.preventDefault()}
+            className="flex flex-col items-center gap-4"
+            onKeyUp={(e: React.KeyboardEvent) => e.key == "Enter" && !disableForm && submit()}
+        >
             <label className="text-lg">Имя</label>
             <CustomInput
                 type="text"
@@ -157,8 +163,9 @@ export default function RegisterForm() {
             <div className="relative">
                 <CustomButton
                     className="mt-2 px-8 py-2"
-                    type="submit"
-                    disabled={loading || !checkResult.correct || !usernameCheck.correct || !usernameCorrect}
+                    type="button"  // иначе будет постоянно отправляться при удерживании enter
+                    onClick={submit}
+                    disabled={disableForm}
                 >Зарегистрироваться
                 </CustomButton>
                 {loading && <div className="absolute left-full top-1 ml-6"><CircleLoader/></div>}

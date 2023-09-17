@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import Avatar from "../account/Avatar";
 import ChatInput from "./ChatInput";
-import MessagesView from "./MessagesView";
 import useSWR from 'swr';
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -20,25 +19,35 @@ export default function ChatView(props: {username: string}) {
     const router = useRouter();
 
     useEffect(() => {
+        messageListRef.current?.scrollTo(0, messageListRef.current.scrollHeight)
+    }, [messages]);
+
+    useEffect(() => {
         UserApi.getMe().then((me) => {
             ChatApi.getChat(props.username).then(({success, data, error}) => {
                 if (!success) {
-                    // Dont care what error
-                    router.push('/chat');
+                    if (error === "not_verified") {
+                        router.push('/emailconfirm');
+                    } else {
+                        // Dont care what error
+                        router.push('/chat');
+                    }
                 } else {
                     const chatUser = data.user as OtherUser;
                     const messages = loadChatMessages(me, chatUser, data.messages);
                     setChatUser(chatUser);
                     setMessages(messages);
+                    // @ts-ignore
                     if (!window['msgSocket']) {
+                        // @ts-ignore
                         window['msgSocket'] = new ChatWebSocket();
                     }
+                    // @ts-ignore
                     const socket: ChatWebSocket = window['msgSocket'];
                     socket.addMessageHandler((msg) => {
                         if (msg.from_user === chatUser.username) {
                             const tMsg = {user: chatUser, date: msg.date, text: msg.text};
                             setMessages([...messages, tMsg]);
-                            setTimeout(() => messageListRef.current?.scrollTo(0, messageListRef.current.scrollHeight));
                         }
                     })
                 }
@@ -56,12 +65,13 @@ export default function ChatView(props: {username: string}) {
     if (!chatUser) return <div></div>;
 
     function sendMessage(message: string) {
+        // @ts-ignore
         if (window["msgSocket"]) {
+            // @ts-ignore
             const socket: ChatWebSocket = window["msgSocket"];
             const chatUser2 = chatUser as OtherUser;
             socket.sendMessage(chatUser2.username, message);
             setMessages([...messages, {user: user, date: new Date(), text: message}]);
-            setTimeout(() => messageListRef.current?.scrollTo(0, messageListRef.current.scrollHeight));
         }
     }
 
@@ -78,9 +88,9 @@ export default function ChatView(props: {username: string}) {
                 </Link>
                 <div className="inline-block mx-4 my-2 align-middle">
                     <div className="inline-block w-fit align-middle">
-                        <Avatar user={user} size={48}/>
+                        <Avatar user={chatUser} size={48}/>
                     </div>
-                    <span className="inline-block ml-4 text-lg align-middle">{user.name}</span>
+                    <span className="inline-block ml-4 text-lg align-middle">{chatUser.name}</span>
                 </div>
             </div>
             <div className="flex-1 min-h-0">

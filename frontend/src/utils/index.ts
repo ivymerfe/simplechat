@@ -15,7 +15,7 @@ export function loadDialogs(me: User, dlgData: any): Dialogs {
         dialogs.push({
             user: dUser,
             lastMessage: {
-                user: dlg.last_message.user === me.username ? me : dUser,
+                user: dlg.last_message.username === me.username ? me : dUser,
                 date: new Date(dlg.last_message.date),
                 text: dlg.last_message.text
             }
@@ -28,15 +28,19 @@ export function loadDialogs(me: User, dlgData: any): Dialogs {
 }
 
 export function replaceDialogMessage(dialogs: Dialogs, username: string, message: Message) {
+    var replaced = false;
     for (const dialog of dialogs) {
         if (dialog.user.username === username) {
             dialog.lastMessage = message;
+            replaced = true;
             break;
         }
     }
+    if (!replaced) return false;
     dialogs.sort(function(a, b){
         return b.lastMessage.date.getTime() - a.lastMessage.date.getTime();
     });
+    return true;
 }
 
 export function loadMessage(message: WsMessage, dialogs: Dialogs): Message | undefined {

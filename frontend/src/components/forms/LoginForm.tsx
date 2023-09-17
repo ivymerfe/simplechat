@@ -8,7 +8,7 @@ import CircleLoader from "../common/CircleLoader";
 import Link from "next/link";
 import { UserApi } from "@/api/user";
 import { useRouter } from "next/navigation";
-import useSWR from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import TokenService from "@/api/token";
 
 export default function LoginForm() {
@@ -23,6 +23,7 @@ export default function LoginForm() {
     if (userCache.data && TokenService.getAccessToken()) { // logout fix
         router.push('/chat');
     }
+    const { mutate } = useSWRConfig();
 
     const checkResult = checkLogin(email, password);
 
@@ -36,10 +37,8 @@ export default function LoginForm() {
         setError("");
     }
 
-    function onSubmit(e: React.FormEvent) {
-        e.preventDefault();
+    function submit() {
         setLoading(true);
-        
         UserApi.login(email, password).then(({success, error}) => {
             setLoading(false);
             if (!success) {
@@ -50,13 +49,19 @@ export default function LoginForm() {
                     console.log(error);
                 }
             } else {
-                router.push("/chat")
+                mutate("user");
+                router.push("/chat");
             }
-        })
+        });
     }
 
+    const disableForm = loading || !checkResult.correct;
     return (
-        <form onSubmit={onSubmit} className="flex flex-col items-center gap-4">
+        <form
+            onSubmit={(e: React.FormEvent) => e.preventDefault()}
+            className="flex flex-col items-center gap-4"
+            onKeyUp={(e: React.KeyboardEvent) => e.key == "Enter" && !disableForm && submit()}
+        >
             <label className="text-lg">Почта</label>
             <CustomInput
                 type="email"
@@ -80,8 +85,9 @@ export default function LoginForm() {
             <div className="relative">
                 <CustomButton
                     className="mt-2 px-8 py-2"
-                    type="submit"
-                    disabled={loading || !checkResult.correct}
+                    type="button"  // иначе будет постоянно отправляться при удерживании enter
+                    onClick={submit}
+                    disabled={disableForm}
                 >Войти
                 </CustomButton>
                 {loading && <div className="absolute left-full top-1/4 ml-6"><CircleLoader/></div>}

@@ -23,7 +23,7 @@ export default function DialogPreview({me, user, lastMessage}: DialogPreviewProp
                         <span className="align-middle text-sm text-sky-900 dark:text-sky-300">{formatDate(lastMessage.date, true)}</span>
                         <span
                             className="inline-block ml-2 w-3/4 align-middle truncate"
-                        >{lastMessage.user === me ? "(Вы) " + lastMessage.text : lastMessage.text}</span>
+                        >{lastMessage.user.username === me.username ? "(Вы) " + lastMessage.text : lastMessage.text}</span>
                     </div>}
                 </div>
             </Link>

@@ -10,7 +10,7 @@ import { checkPasswordReset, validateEmail } from "@/utils/validate";
 import { UserApi } from "@/api/user";
 import { mapErrors } from "@/api/errors";
 import { useRouter } from "next/navigation";
-import useSWR from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import TokenService from "@/api/token";
 
 export default function PasswordResetForm() {
@@ -29,6 +29,7 @@ export default function PasswordResetForm() {
     if (userCache.data && TokenService.getAccessToken()) { // logout fix
         router.push('/chat');
     }
+    const { mutate } = useSWRConfig();
 
     const emailCorrect = email && validateEmail(email);
     const formCheck = checkPasswordReset(emailCode, password, repeatedPass);
@@ -42,7 +43,7 @@ export default function PasswordResetForm() {
         }
     }
 
-    function onSubmit() {
+    function submit() {
         // Request api: check if exists and send code
         // Also set loading
         if (!emailAccepted) {
@@ -71,7 +72,8 @@ export default function PasswordResetForm() {
                             console.log(error);
                         }
                     } else {
-                        router.push("/chat")
+                        mutate("user");
+                        router.push("/chat");
                     }
                 })
             } else {
@@ -139,8 +141,9 @@ export default function PasswordResetForm() {
         </>
     )
 
+    const disableForm = !emailCorrect || (emailAccepted && !formCheck.correct);
     return (
-        <div className="flex flex-col items-center gap-6">
+        <div className="flex flex-col items-center gap-6" onKeyUp={(e: React.KeyboardEvent) => e.key == "Enter" && !disableForm && submit()}>
             <span className="block text-lg">Почта</span>
             <div className="relative w-full">
                 <CustomInput
@@ -161,8 +164,8 @@ export default function PasswordResetForm() {
             <div className="relative">
                 <CustomButton
                     className="px-8 py-2"
-                    disabled={!emailCorrect || (emailAccepted && !formCheck.correct)}
-                    onClick={onSubmit}
+                    disabled={disableForm}
+                    onClick={submit}
                 >
                     {emailAccepted ? "Сохранить" : "Продолжить"}
                 </CustomButton>

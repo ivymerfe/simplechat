@@ -35,10 +35,10 @@ export default function DialogsView() {
     }
 
     useEffect(() => {
-        UserApi.getMe().then(async (user) => {
+        UserApi.getMe().then(async (me) => {
             // We got user, request for dialogs
             // Then create websocket
-            const ok = await requestDialogs(user);
+            const ok = await requestDialogs(me);
             if (ok) {
                 if (!window['msgSocket' as any]) {
                     (window as any).msgSocket = new ChatWebSocket();
@@ -46,14 +46,20 @@ export default function DialogsView() {
                 const socket: ChatWebSocket = (window as any).msgSocket;
                 socket.addMessageHandler(async (msg) => {
                     var tMsg = loadMessage(msg, dialogsRef.current);
-                    if (!tMsg && (await requestDialogs(user))) { // new dialog
-                        tMsg = loadMessage(msg, dialogsRef.current);
+                    if (tMsg) {
+                        replaceDialogMessage(dialogsRef.current, msg.from_user, tMsg as Message);
+                        setDialogs([...dialogsRef.current]);  // otherwise no re-render
+                    } else {  // new dialog
+                        await requestDialogs(me);
                     }
-                    if (!tMsg) {
-                        console.error('Failed to get message user: ', tMsg);
+                });
+                socket.addSendHandler(async (to_user: string, text: string) => {
+                    const msg = {user: me, date: new Date(), text};
+                    if (replaceDialogMessage(dialogsRef.current, to_user, msg)) {
+                        setDialogs([...dialogsRef.current]);
+                    } else {
+                        await requestDialogs(me);
                     }
-                    replaceDialogMessage(dialogsRef.current, msg.from_user, tMsg as Message);
-                    setDialogs([...dialogsRef.current]);  // otherwise no re-render
                 });
             }
         }).catch((e) => e !== "unauthorized" && console.error(e));
@@ -66,7 +72,6 @@ export default function DialogsView() {
     }
     if (!userCache.data) return <div></div>;
     const user: User = userCache.data;
-
 
     return (
         <div className="h-full bg-sky-400 dark:bg-sky-600 flex flex-col">

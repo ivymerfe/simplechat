@@ -9,6 +9,7 @@ export type WsMessage = {
 export default class ChatWebSocket {
     socket: WebSocket;
     messageHandlers: ((message: WsMessage) => void)[];
+    sendHandlers: ((to_user: string, text: string) => void)[];
     closed: boolean;
     closeCode: number;
 
@@ -24,6 +25,7 @@ export default class ChatWebSocket {
         this.closed = false;
         this.closeCode = 0;
         this.messageHandlers = [];
+        this.sendHandlers = [];
     }
 
     addMessageHandler(handler: ((message: WsMessage) => void)) {
@@ -33,6 +35,16 @@ export default class ChatWebSocket {
     removeMessageHandler(handler: ((message: WsMessage) => void)) {
         if (this.messageHandlers.includes(handler)) {
             this.messageHandlers.splice(this.messageHandlers.indexOf(handler), 1);
+        }
+    }
+
+    addSendHandler(handler: (to_user: string, text: string) => void) {
+        this.sendHandlers.push(handler);
+    }
+
+    removeSendHandler(handler: (to_user: string, text: string) => void) {
+        if (this.sendHandlers.includes(handler)) {
+            this.sendHandlers.splice(this.sendHandlers.indexOf(handler), 1);
         }
     }
 
@@ -57,6 +69,9 @@ export default class ChatWebSocket {
 
     sendMessage(to_user: string, text: string) {
         this.socket.send(JSON.stringify({ to_user, text }));
+        for (const handler of this.sendHandlers) {
+            handler(to_user, text);
+        }
     }
 
     onClose(event: CloseEvent) {
